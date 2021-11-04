@@ -5,16 +5,14 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class User {
+export class Door {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column("varchar", {nullable: false})
-    username: string;
+    name: string;
 
     @Column("varchar", {nullable: false})
-    password: string;
+    hash: string;
 
-    @Column("varchar", {nullable: false})
-    type: string;
 }

@@ -5,16 +5,10 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class User {
+export class Section {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column("varchar", {nullable: false})
-    username: string;
-
-    @Column("varchar", {nullable: false})
-    password: string;
-
-    @Column("varchar", {nullable: false})
-    type: string;
+    name: string;
 }

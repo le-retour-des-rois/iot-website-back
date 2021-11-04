@@ -1,6 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
 
-
 export class CreateUserDto {
     @IsNotEmpty({message: 'Please enter a right username'})
     username: string;

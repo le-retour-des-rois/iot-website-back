@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS admin_user (
 
 CREATE TABLE IF NOT EXISTS door (
     id          SERIAL  PRIMARY KEY,
+    name        VARCHAR NOT NULL,
     hash        VARCHAR NOT NULL
 );
 
