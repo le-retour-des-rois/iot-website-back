@@ -1,0 +1,18 @@
+version: "3"
+services:
+  postgres:
+    container_name: iot_postgres
+    image: postgres:latest
+    ports:
+    - "5438:5432"
+    volumes:
+    - ./data:/var/lib/postgresql/data
+    - ./template.sql:/tmp/template.sql
+    env_file:
+    - docker.env
+    networks:
+    - iot_postgres_net
+
+networks:
+  iot_postgres_net:
+    driver: bridge
