@@ -1,11 +1,19 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateDoorDto } from './dto/create-door.dto';
 import { UpdateDoorDto } from './dto/update-door.dto';
+import { Door } from './entities/door.entity';
 
 @Injectable()
 export class DoorService {
-  create(createDoorDto: CreateDoorDto) {
-    return 'This action adds a new door';
+  constructor(
+    @InjectRepository(Door)
+    private doorRepository: Repository<Door>
+  ) {}
+
+  async create(createDoorDto: CreateDoorDto) {
+    return this.doorRepository.save(createDoorDto);
   }
 
   findAll() {
