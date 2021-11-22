@@ -1,4 +1,4 @@
-import {
+/*import {
     Column,
     Entity,
     PrimaryGeneratedColumn,
@@ -19,4 +19,4 @@ export class OrgSection {
 export class OrgSectionTmp {
     org_id: number;
     section_id: number;
-}
+}*/

@@ -17,4 +17,7 @@ export class User {
 
     @Column("varchar", {nullable: false})
     type: string;
+
+    @Column("integer", {nullable: false})
+    org_id: number;
 }

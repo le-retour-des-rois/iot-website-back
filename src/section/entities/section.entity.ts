@@ -11,4 +11,7 @@ export class Section {
 
     @Column("varchar", {nullable: false})
     name: string;
+
+    @Column("integer", {nullable: false})
+    org_id: number;
 }

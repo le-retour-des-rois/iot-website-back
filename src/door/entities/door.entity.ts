@@ -15,4 +15,9 @@ export class Door {
     @Column("varchar", {nullable: false})
     hash: string;
 
+    @Column("integer", {nullable: false})
+    org_id: number;
+
+    @Column("integer", {nullable: false})
+    section_id: number;
 }
