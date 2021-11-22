@@ -13,7 +13,11 @@ export class OrganizationService {
   ) {}
 
   async create(createOrganizationDto: CreateOrganizationDto) {
-    return await this.organizationRepository.save(createOrganizationDto);
+    const org = await this.organizationRepository.save(createOrganizationDto);
+    if (!org) {
+      throw new HttpException('Organization creation failed', HttpStatus.BAD_REQUEST);
+    }
+    return 'Organization ' + createOrganizationDto.name + ' created !';
   }
 
   async findAll(): Promise<Organization[]> {
