@@ -15,3 +15,8 @@ export class Section {
     @Column("integer", {nullable: false})
     org_id: number;
 }
+
+export class SectionTmp {
+    name: string;
+    org_id: number;
+}

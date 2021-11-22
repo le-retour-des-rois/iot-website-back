@@ -13,6 +13,11 @@ export class OrganizationService {
   ) {}
 
   async create(createOrganizationDto: CreateOrganizationDto) {
+    const check_org = await this.organizationRepository.findOne({name: createOrganizationDto.name});
+    if (check_org) {
+      throw new HttpException('Organization already exists', HttpStatus.BAD_REQUEST);
+    }
+
     const org = await this.organizationRepository.save(createOrganizationDto);
     if (!org) {
       throw new HttpException('Organization creation failed', HttpStatus.BAD_REQUEST);

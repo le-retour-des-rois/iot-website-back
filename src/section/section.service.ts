@@ -4,7 +4,7 @@ import { Organization } from 'src/organization/entities/organization.entity';
 import { Repository } from 'typeorm';
 import { CreateSectionDto } from './dto/create-section.dto';
 import { UpdateSectionDto } from './dto/update-section.dto';
-import { Section } from './entities/section.entity';
+import { Section, SectionTmp } from './entities/section.entity';
 
 @Injectable()
 export class SectionService {
@@ -25,34 +25,24 @@ export class SectionService {
       throw new HttpException('Organization does not exist', HttpStatus.NOT_FOUND);
     }
 
-    const check_section = await this.sectionRepository.find({name: createSectionDto.name});
+    const check_section = await this.sectionRepository.findOne({
+      name: createSectionDto.name,
+      org_id: org.id
+    });
 
-    /*// Verify if a section with the same name exists
-    if (check_section != []) {
-      const check_org_section = await this.orgSectionRepository.findOne({section_id: check_section.id});
-      const check_org = await this.organizationRepository.findOne({id: check_org_section.org_id});
-      console.log("check_org.name" + check_org.name)
-      console.log("createSectionDto.organization_name" + createSectionDto.organization_name)
-      // Verify if the associated organization is the same as the one in the createSectionDto Object
-      if (check_org.name == createSectionDto.organization_name) {
-        throw new HttpException('This section already exists', HttpStatus.BAD_REQUEST);
-      }
-    }*/
+    if (check_section) {
+      throw new HttpException(createSectionDto.name + ' already exists in ' + org.name, HttpStatus.BAD_REQUEST);
+    }
 
-    const section = await this.sectionRepository.save(createSectionDto);
+    const sectionTmp: SectionTmp = {
+      name: createSectionDto.name,
+      org_id: org.id
+    }
+
+    const section = await this.sectionRepository.save(sectionTmp);
     if (!section) {
       throw new HttpException('Failed to create the section', HttpStatus.BAD_REQUEST);
     }
-
-    /*const orgSection: OrgSectionTmp = {
-      org_id: org.id,
-      section_id: section.id
-    }
-
-    const res = await this.orgSectionRepository.save(orgSection);
-    if (!res) {
-      throw new HttpException('Failed to create the org_section', HttpStatus.BAD_REQUEST);
-    }*/
 
     return createSectionDto.name + ' added in organization ' + createSectionDto.organization_name;
   }
