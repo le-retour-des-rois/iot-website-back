@@ -17,14 +17,19 @@ export class SectionController {
     return this.sectionService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.sectionService.findOne(+id);
+  @Get(':org_name')
+  findAllInOrg(@Param('org_name') organization_name: string) {
+    return this.sectionService.findAllInOrg(organization_name);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSectionDto: UpdateSectionDto) {
-    return this.sectionService.update(+id, updateSectionDto);
+  @Get(':org_name/:section_name')
+  findOne(@Param('org_name') organization_name: string, @Param('section_name') section_name: string) {
+    return this.sectionService.findOne(organization_name, section_name);
+  }
+
+  @Patch(':org_name/:section_name')
+  update(@Param('org_name') org_name: string, @Param('section_name') section_name: string, @Body() updateSectionDto: UpdateSectionDto) {
+    return this.sectionService.update(org_name, section_name, updateSectionDto);
   }
 
   @Delete(':id')

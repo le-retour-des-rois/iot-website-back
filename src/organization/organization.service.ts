@@ -45,17 +45,16 @@ export class OrganizationService {
     throw new HttpException('Organization does not exist', HttpStatus.NOT_FOUND);
   }
 
-
   async update(id: number, updateOrganizationDto: UpdateOrganizationDto) {
-    const projet = await this.findOne(id);
-    if (projet)
-      return this.organizationRepository.update(projet, updateOrganizationDto);
+    const org = await this.findOne(id);
+    if (org)
+      return this.organizationRepository.update(org, updateOrganizationDto);
   }
 
   async remove(id: number) {
-    const projet = await this.findOne(id);
-    if (projet)
-      return this.organizationRepository.remove(projet)
+    const org = await this.findOne(id);
+    if (org)
+      return this.organizationRepository.remove(org)
     throw new HttpException('Organization does not exist', HttpStatus.NOT_FOUND); 
   }
 }

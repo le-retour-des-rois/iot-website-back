@@ -16,15 +16,18 @@ export class SectionService {
     private organizationRepository: Repository<Organization>,
   ) {}
 
-  // ------------------------- //
-  // ----- CREATE SECTION----- //
-  // ------------------------- //
+  // -------------------------- //
+  // ----- CREATE SECTION ----- //
+  // -------------------------- //
   async create(createSectionDto: CreateSectionDto) {
+
+    // --- Verify if org exists --- //
     const org = await this.organizationRepository.findOne({name: createSectionDto.organization_name});
     if (!org) {
       throw new HttpException('Organization does not exist', HttpStatus.NOT_FOUND);
     }
 
+    // --- Verify if section already exists inside the same organization --- //
     const check_section = await this.sectionRepository.findOne({
       name: createSectionDto.name,
       org_id: org.id
@@ -34,6 +37,7 @@ export class SectionService {
       throw new HttpException(createSectionDto.name + ' already exists in ' + org.name, HttpStatus.BAD_REQUEST);
     }
 
+    // --- Add section --- //
     const sectionTmp: SectionTmp = {
       name: createSectionDto.name,
       org_id: org.id
@@ -57,34 +61,75 @@ export class SectionService {
   // --------------------------------------- //
   // ----- FIND ALL SECTIONS IN AN ORG ----- //
   // --------------------------------------- //
-  /*async findAllInOrg(organization_name: string): Promise<Section[]> {
+  async findAllInOrg(organization_name: string): Promise<Section[]> {
+
+    // --- Verify if org exists --- //
     const org = await this.organizationRepository.findOne({name: organization_name});
     if (!org) {
       throw new HttpException('Organization does not exist', HttpStatus.NOT_FOUND);
     }
     
-    return await this.sectionRepository.find();
-  }*/
+    return await this.sectionRepository.find({org_id: org.id});
+  }
 
-  
-  async findOne(id: number): Promise<Section> {
-    const door = await this.sectionRepository.findOne(id);
-    if (door) {
-      return door;
+  async findOne(organization_name: string, section_name: string): Promise<Section> {
+
+    // --- Verify if org exists --- //
+    const org = await this.organizationRepository.findOne({name: organization_name});
+    if (!org) {
+      throw new HttpException('Organization does not exist', HttpStatus.NOT_FOUND);
+    }
+
+    const section = await this.sectionRepository.findOne({name: section_name});
+    if (section) {
+      return section;
     }
     throw new HttpException('Section does not exist', HttpStatus.NOT_FOUND);
   }
 
-  async update(id: number, updateSectionDto: UpdateSectionDto) {
-    const projet = await this.findOne(id);
-    if (projet)
-      return this.sectionRepository.update(projet, updateSectionDto);
+  async update(org_name: string, section_name: string, updateSectionDto: UpdateSectionDto) {
+
+    // --- Verify if the user is trying to move the section to another organization --- //
+    if (updateSectionDto.organization_name != org_name) {
+      throw new HttpException('Forbidden !! You\'re not allowed to change the organization', HttpStatus.BAD_REQUEST);
+    }
+
+    // --- Case there isn't any update --- //
+    if (updateSectionDto.name == section_name) {
+      return "No update applied"
+    }
+
+    // --- Verify if org exists --- //
+    const org = await this.organizationRepository.findOne({name: org_name});
+    if (!org) {
+      throw new HttpException('Organization does not exist', HttpStatus.NOT_FOUND);
+    }
+    
+    // --- Verify if section exists --- //
+    const section = await this.sectionRepository.findOne({name: section_name});
+    if (!section) {
+      throw new HttpException('Section does not exist', HttpStatus.NOT_FOUND);
+    }
+
+    // --- Try to update --- //
+    const sectionTmp: SectionTmp = {
+      name: updateSectionDto.name,
+      org_id: org.id
+    }
+
+    const answer = await this.sectionRepository.update(section, sectionTmp);
+    if (!answer) {
+      throw new HttpException('Failed to create the section', HttpStatus.BAD_REQUEST);
+    }
+
+    return updateSectionDto.name + ' updated in organization ' + updateSectionDto.organization_name;
   }
 
   async remove(id: number) {
-    const projet = await this.findOne(id);
+    /*const projet = await this.findOne(id);
     if (projet)
       return this.sectionRepository.remove(projet)
-    throw new HttpException('Section does not exist', HttpStatus.NOT_FOUND); 
+    throw new HttpException('Section does not exist', HttpStatus.NOT_FOUND);*/
+    return false
   }
 }
