@@ -17,14 +17,24 @@ export class DoorController {
     return this.doorService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.doorService.findOne(+id);
+  @Get(':org_name')
+  findAllInOrg(@Param('org_name') org_name: string) {
+    return this.doorService.findAllInOrg(org_name);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDoorDto: UpdateDoorDto) {
-    return this.doorService.update(+id, updateDoorDto);
+  @Get(':org_name/:section_name')
+  findAllInSect(@Param('org_name') org_name: string, @Param('section_name') section_name: string) {
+    return this.doorService.findAllInSect(org_name, section_name);
+  }
+
+  @Get(':org_name/:section_name/:door_name')
+  findOne(@Param('org_name') org_name: string, @Param('section_name') section_name: string, @Param('door_name') door_name: string) {
+    return this.doorService.findOne(org_name, section_name, door_name);
+  }
+
+  @Patch(':org_name/:section_name/:door_name')
+  update(@Param('org_name') org_name: string, @Param('section_name') section_name: string, @Param('door_name') door_name: string, @Body() updateDoorDto: UpdateDoorDto) {
+    return this.doorService.update(org_name, section_name, door_name, updateDoorDto);
   }
 
   @Delete(':id')

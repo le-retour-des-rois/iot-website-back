@@ -21,3 +21,10 @@ export class Door {
     @Column("integer", {nullable: false})
     section_id: number;
 }
+
+export class DoorTmp {
+    name: string;
+    hash: string;
+    org_id: number;
+    section_id: number;
+}
