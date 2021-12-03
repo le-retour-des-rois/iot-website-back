@@ -25,6 +25,7 @@ export class DoorService {
   // ----------------------- //
   async create(createDoorDto: CreateDoorDto) {
     // --- Verify if org exists --- //
+    console.log(createDoorDto.organization_name)
     const org = await this.organizationRepository.findOne({name: createDoorDto.organization_name});
     if (!org) {
       throw new HttpException('Organization does not exist', HttpStatus.NOT_FOUND);
@@ -33,7 +34,7 @@ export class DoorService {
     // --- Verify if section exists --- //
     const section = await this.sectionRepository.findOne({name: createDoorDto.section_name});
     if (!section) {
-      throw new HttpException('Organization does not exist', HttpStatus.NOT_FOUND);
+      throw new HttpException('Section does not exist', HttpStatus.NOT_FOUND);
     }
 
     // --- Verify if door already exists inside the same section --- //
@@ -55,7 +56,7 @@ export class DoorService {
       section_id: section.id
     }
 
-    const door = await this.sectionRepository.save(doorTmp);
+    const door = await this.doorRepository.save(doorTmp);
     if (!door) {
       throw new HttpException('Failed to create the door', HttpStatus.BAD_REQUEST);
     }
@@ -174,10 +175,27 @@ export class DoorService {
     return updateDoorDto.name + ' updated in ' + updateDoorDto.organization_name + '\'s ' + updateDoorDto.section_name;
   }
 
-  async remove(id: number) {
-    /*const projet = await this.findOne(id);
-    if (projet)
-      return this.doorRepository.remove(projet)*/
-    throw new HttpException('Door does not exist', HttpStatus.NOT_FOUND); 
+  async remove(org_name: string, section_name: string, door_name: string) {
+    // --- Verify if org exists --- //
+    const org = await this.organizationRepository.findOne({name: org_name});
+    if (!org) {
+      throw new HttpException('Organization does not exist', HttpStatus.NOT_FOUND);
+    }
+     
+    // --- Verify if section exists --- //
+    const section = await this.sectionRepository.findOne({name: section_name});
+    if (!section) {
+      throw new HttpException('Section does not exist', HttpStatus.NOT_FOUND);
+    }
+
+    const door = await this.doorRepository.findOne(
+      {
+        name: door_name,
+        org_id: org.id,
+        section_id: section.id
+      });
+    if (door)
+      return this.doorRepository.remove(door)
+    throw new HttpException('Door does not exist', HttpStatus.NOT_FOUND);
   }
 }

@@ -37,8 +37,8 @@ export class DoorController {
     return this.doorService.update(org_name, section_name, door_name, updateDoorDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.doorService.remove(+id);
+  @Delete(':org_name/:section_name/:door_name')
+  remove(@Param('org_name') org_name: string, @Param('section_name') section_name: string, @Param('door_name') door_name: string) {
+    return this.doorService.remove(org_name, section_name, door_name);
   }
 }

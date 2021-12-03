@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Door } from 'src/door/entities/door.entity';
 import { Organization } from 'src/organization/entities/organization.entity';
 import { Repository } from 'typeorm';
 import { CreateSectionDto } from './dto/create-section.dto';
@@ -14,6 +15,9 @@ export class SectionService {
 
     @InjectRepository(Organization)
     private organizationRepository: Repository<Organization>,
+
+    @InjectRepository(Door)
+    private doorRepository: Repository<Door>,
   ) {}
 
   // -------------------------- //
@@ -125,11 +129,28 @@ export class SectionService {
     return updateSectionDto.name + ' updated in organization ' + updateSectionDto.organization_name;
   }
 
-  async remove(id: number) {
-    /*const projet = await this.findOne(id);
-    if (projet)
-      return this.sectionRepository.remove(projet)
-    throw new HttpException('Section does not exist', HttpStatus.NOT_FOUND);*/
-    return false
+  async remove(org_name: string, section_name: string) {
+    // --- Verify if org exists --- //
+    const org = await this.organizationRepository.findOne({name: org_name});
+    if (!org) {
+      throw new HttpException('Organization does not exist', HttpStatus.NOT_FOUND);
+    }
+     
+    // --- Verify if section exists --- //
+    const section = await this.sectionRepository.findOne({name: section_name});
+    if (!section) {
+      throw new HttpException('Section does not exist', HttpStatus.NOT_FOUND);
+    }
+
+    // --- Verify if a door exists in this section --- //
+    const door = await this.doorRepository.findOne(
+      {
+        org_id: org.id,
+        section_id: section.id
+      });
+    if (door)
+      throw new HttpException('Section not empty', HttpStatus.BAD_REQUEST);
+
+    return await this.sectionRepository.remove(section);
   }
 }

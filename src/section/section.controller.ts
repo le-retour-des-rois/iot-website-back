@@ -32,8 +32,8 @@ export class SectionController {
     return this.sectionService.update(org_name, section_name, updateSectionDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.sectionService.remove(+id);
+  @Delete(':org_name/:section_name')
+  remove(@Param('org_name') org_name: string, @Param('section_name') section_name: string) {
+    return this.sectionService.remove(org_name, section_name);
   }
 }

@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Section } from 'src/section/entities/section.entity';
 import { Repository } from 'typeorm';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
@@ -9,7 +10,10 @@ import { Organization } from './entities/organization.entity';
 export class OrganizationService {
   constructor(
     @InjectRepository(Organization)
-    private organizationRepository: Repository<Organization>
+    private organizationRepository: Repository<Organization>,
+
+    @InjectRepository(Section)
+    private sectionRepository: Repository<Section>
   ) {}
 
   async create(createOrganizationDto: CreateOrganizationDto) {
@@ -52,9 +56,17 @@ export class OrganizationService {
   }
 
   async remove(id: number) {
-    const org = await this.findOne(id);
-    if (org)
-      return this.organizationRepository.remove(org)
-    throw new HttpException('Organization does not exist', HttpStatus.NOT_FOUND); 
+    // --- Verify if org exists --- //
+    const org = await this.organizationRepository.findOne(id);
+    if (!org) {
+      throw new HttpException('Organization does not exist', HttpStatus.NOT_FOUND);
+    }
+
+    // --- Verify if a section exists in this organization --- //
+    const section = await this.sectionRepository.findOne({ org_id: org.id });
+    if (section)
+      throw new HttpException('Organization not empty', HttpStatus.BAD_REQUEST);
+
+    return await this.organizationRepository.remove(org);
   }
 }
