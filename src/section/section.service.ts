@@ -137,7 +137,10 @@ export class SectionService {
     }
      
     // --- Verify if section exists --- //
-    const section = await this.sectionRepository.findOne({name: section_name});
+    const section = await this.sectionRepository.findOne({
+      name: section_name,
+      org_id: org.id
+    });
     if (!section) {
       throw new HttpException('Section does not exist', HttpStatus.NOT_FOUND);
     }

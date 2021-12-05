@@ -21,3 +21,10 @@ export class User {
     @Column("integer", {nullable: false})
     org_id: number;
 }
+
+export class UserTmp {
+    username: string;
+    password: string;
+    type: string;
+    org_id: number;
+}

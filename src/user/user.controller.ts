@@ -17,6 +17,11 @@ export class UserController {
     return this.userService.findAll();
   }
 
+  @Get(':org_name')
+  findAllInOrg(@Param('org_name') org_name: string) {
+    return this.userService.findAllInOrg(org_name);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.userService.findOne(+id);
@@ -27,8 +32,8 @@ export class UserController {
     return this.userService.update(+id, updateUserDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  @Delete(':org_name/:username')
+  remove(@Param('org_name') org_name: string, @Param('username') username: string) {
+    return this.userService.remove(org_name, username);
   }
 }
