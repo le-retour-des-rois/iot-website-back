@@ -29,6 +29,23 @@ CREATE TABLE IF NOT EXISTS "user" (
     org_id      SERIAL  REFERENCES  organization(id) NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS auth (
+    id          SERIAL  PRIMARY KEY,
+    user_id     SERIAL  REFERENCES  "user"(id) NOT NULL,
+    door_id     SERIAL  REFERENCES  door(id) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS transactions (
+    id          SERIAL  PRIMARY KEY,
+    date        timestamp without time zone DEFAULT now(),
+    door_id     SERIAL REFERENCES door(id) NOT NULL,
+    org_id      SERIAL REFERENCES organization(id) NOT NULL,
+    section_id  SERIAL REFERENCES section(id) NOT NULL,
+    user_id     SERIAL REFERENCES "user"(id) NOT NULL
+);
+
+----------
+
 CREATE TABLE IF NOT EXISTS admin_user (
     id          SERIAL  PRIMARY KEY,
     username    VARCHAR NOT NULL,
@@ -40,13 +57,4 @@ CREATE TABLE IF NOT EXISTS user_hash (
     id          SERIAL  PRIMARY KEY,
     user_id     SERIAL  REFERENCES  "user"(id) NOT NULL,
     hash        VARCHAR NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS transactions (
-    id          SERIAL  PRIMARY KEY,
-    date        timestamp without time zone DEFAULT now(),
-    door_id     SERIAL REFERENCES door(id) NOT NULL,
-    org_id      SERIAL REFERENCES organization(id) NOT NULL,
-    section_id  SERIAL REFERENCES section(id) NOT NULL,
-    user_id     SERIAL REFERENCES "user"(id) NOT NULL
 );
