@@ -2,6 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Organization } from 'src/organization/entities/organization.entity';
 import { Section } from 'src/section/entities/section.entity';
+import { TransactionsClass } from 'src/transactions/entities/transaction.entity';
+import { TransactionsService } from 'src/transactions/transactions.service';
 import { Repository } from 'typeorm';
 import { CreateDoorDto } from './dto/create-door.dto';
 import { UpdateDoorDto } from './dto/update-door.dto';
@@ -17,7 +19,9 @@ export class DoorService {
     private organizationRepository: Repository<Organization>,
 
     @InjectRepository(Door)
-    private doorRepository: Repository<Door>
+    private doorRepository: Repository<Door>,
+
+    private transactionsService: TransactionsService
   ) {}
 
   // ----------------------- //
@@ -60,6 +64,17 @@ export class DoorService {
     if (!door) {
       throw new HttpException('Failed to create the door', HttpStatus.BAD_REQUEST);
     }
+
+    // --- Fill the transaction table --- //
+    const trans: TransactionsClass = {
+      method: 'createDoor',
+      org_id: org.id,
+      section_id: section.id,
+      user_id: null,
+      door_id: door.id
+    }
+
+    await this.transactionsService.create(trans);
 
     return createDoorDto.name + ' added in ' + createDoorDto.organization_name + '\'s ' + createDoorDto.section_name;
   }
@@ -172,6 +187,17 @@ export class DoorService {
       throw new HttpException('Failed to update the door', HttpStatus.BAD_REQUEST);
     }
   
+    // --- Fill the transaction table --- //
+    const trans: TransactionsClass = {
+      method: 'updateDoor',
+      org_id: org.id,
+      section_id: section.id,
+      user_id: null,
+      door_id: door.id
+    }
+
+    await this.transactionsService.create(trans);
+
     return updateDoorDto.name + ' updated in ' + updateDoorDto.organization_name + '\'s ' + updateDoorDto.section_name;
   }
 
@@ -194,8 +220,19 @@ export class DoorService {
         org_id: org.id,
         section_id: section.id
       });
-    if (door)
+    if (door) {
+      // --- Fill the transaction table --- //
+      const trans: TransactionsClass = {
+        method: 'createSection',
+        org_id: org.id,
+        section_id: section.id,
+        user_id: null,
+        door_id: door.id
+      }
+
+      await this.transactionsService.create(trans);
       return this.doorRepository.remove(door)
+    }
     throw new HttpException('Door does not exist', HttpStatus.NOT_FOUND);
   }
 }

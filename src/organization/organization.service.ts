@@ -1,6 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Section } from 'src/section/entities/section.entity';
+import { TransactionsClass } from 'src/transactions/entities/transaction.entity';
+import { TransactionsService } from 'src/transactions/transactions.service';
 import { Repository } from 'typeorm';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
@@ -13,7 +15,9 @@ export class OrganizationService {
     private organizationRepository: Repository<Organization>,
 
     @InjectRepository(Section)
-    private sectionRepository: Repository<Section>
+    private sectionRepository: Repository<Section>,
+
+    private readonly transactionsService: TransactionsService
   ) {}
 
   async create(createOrganizationDto: CreateOrganizationDto) {
@@ -26,6 +30,19 @@ export class OrganizationService {
     if (!org) {
       throw new HttpException('Organization creation failed', HttpStatus.BAD_REQUEST);
     }
+
+    // --- Fill the transaction table --- //
+    const trans: TransactionsClass = {
+      method: 'createOrg',
+      org_id: org.id,
+      section_id: null,
+      user_id: null,
+      door_id: null
+    }
+
+    await this.transactionsService.create(trans);
+
+    // --- Return the function --- //
     return 'Organization ' + createOrganizationDto.name + ' created !';
   }
 
@@ -51,8 +68,19 @@ export class OrganizationService {
 
   async update(id: number, updateOrganizationDto: UpdateOrganizationDto) {
     const org = await this.findOne(id);
-    if (org)
+    if (org) {
+      // --- Fill the transaction table --- //
+      const trans: TransactionsClass = {
+        method: 'updateOrg',
+        org_id: org.id,
+        section_id: null,
+        user_id: null,
+        door_id: null
+      }
+      await this.transactionsService.create(trans);
+
       return this.organizationRepository.update(org, updateOrganizationDto);
+    }
   }
 
   async remove(id: number) {
@@ -66,6 +94,16 @@ export class OrganizationService {
     const section = await this.sectionRepository.findOne({ org_id: org.id });
     if (section)
       throw new HttpException('Organization not empty', HttpStatus.BAD_REQUEST);
+
+    // --- Fill the transaction table --- //
+    const trans: TransactionsClass = {
+      method: 'deleteOrg',
+      org_id: org.id,
+      section_id: null,
+      user_id: null,
+      door_id: null
+    }
+    await this.transactionsService.create(trans);
 
     return await this.organizationRepository.remove(org);
   }

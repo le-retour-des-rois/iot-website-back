@@ -1,6 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Organization } from 'src/organization/entities/organization.entity';
+import { TransactionsClass } from 'src/transactions/entities/transaction.entity';
+import { TransactionsService } from 'src/transactions/transactions.service';
 import { DeleteResult, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -13,7 +15,9 @@ export class UserService {
     private userRepository: Repository<User>,
 
     @InjectRepository(Organization)
-    private organizationRepository: Repository<Organization>
+    private organizationRepository: Repository<Organization>,
+
+    private transactionsService: TransactionsService
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -33,7 +37,13 @@ export class UserService {
       org_id: org.id
     });
 
-    if (check_user) {
+    // --- Verify if mac addr already exists inside the same organization --- //
+    const check_mac = await this.userRepository.findOne({
+      mac_addr: createUserDto.mac_addr,
+      org_id: org.id
+    });
+
+    if (check_user || check_mac) {
       throw new HttpException(createUserDto.username + ' already exists in ' + org.name, HttpStatus.BAD_REQUEST);
     }
 
@@ -41,6 +51,7 @@ export class UserService {
     const userTmp: UserTmp = {
       username: createUserDto.username,
       password: createUserDto.password,
+      mac_addr: createUserDto.mac_addr,
       type: createUserDto.type,
       org_id: org.id
     }
@@ -49,6 +60,17 @@ export class UserService {
     if (!user) {
       throw new HttpException('Failed to create the user', HttpStatus.BAD_REQUEST);
     }
+
+    // --- Fill the transaction table --- //
+    const trans: TransactionsClass = {
+      method: 'createUser',
+      org_id: org.id,
+      section_id: null,
+      user_id: user.id,
+      door_id: null
+    }
+
+    await this.transactionsService.create(trans);
 
     return createUserDto.username + ' added in organization ' + createUserDto.organization_name;
   }
@@ -88,14 +110,26 @@ export class UserService {
     const userTmp: UserTmp = {
       username: updateUserDto.username,
       password: updateUserDto.password,
+      mac_addr: updateUserDto.mac_addr,
       type: updateUserDto.type,
       org_id: org.id
     }
 
     const answer = await this.userRepository.update(user, userTmp);
     if (!answer) {
-      throw new HttpException('Failed to create the user', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Failed to update the user', HttpStatus.BAD_REQUEST);
     }
+
+    // --- Fill the transaction table --- //
+    const trans: TransactionsClass = {
+      method: 'updateUser',
+      org_id: org.id,
+      section_id: null,
+      user_id: user.id,
+      door_id: null
+    }
+
+    await this.transactionsService.create(trans);
 
     return updateUserDto.username + ' updated in organization ' + org.name;
   }
@@ -111,6 +145,21 @@ export class UserService {
     if (!deleteResponse.affected) {
       throw new HttpException("User not found. Can't be deleted", HttpStatus.NOT_FOUND);
     }
+
+
+    // --- Fill the transaction table --- //
+    const user = await this.userRepository.findOne({ username : username });
+
+    const trans: TransactionsClass = {
+      method: 'createUser',
+      org_id: org.id,
+      section_id: null,
+      user_id: user.id,
+      door_id: null
+    }
+
+    await this.transactionsService.create(trans);
+
     return deleteResponse;
   }
 }

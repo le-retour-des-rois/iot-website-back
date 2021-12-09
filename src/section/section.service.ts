@@ -2,6 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Door } from 'src/door/entities/door.entity';
 import { Organization } from 'src/organization/entities/organization.entity';
+import { TransactionsClass } from 'src/transactions/entities/transaction.entity';
+import { TransactionsService } from 'src/transactions/transactions.service';
 import { Repository } from 'typeorm';
 import { CreateSectionDto } from './dto/create-section.dto';
 import { UpdateSectionDto } from './dto/update-section.dto';
@@ -18,6 +20,8 @@ export class SectionService {
 
     @InjectRepository(Door)
     private doorRepository: Repository<Door>,
+
+    private readonly transactionsService: TransactionsService
   ) {}
 
   // -------------------------- //
@@ -51,6 +55,17 @@ export class SectionService {
     if (!section) {
       throw new HttpException('Failed to create the section', HttpStatus.BAD_REQUEST);
     }
+
+    // --- Fill the transaction table --- //
+    const trans: TransactionsClass = {
+      method: 'createSection',
+      org_id: org.id,
+      section_id: section.id,
+      user_id: null,
+      door_id: null
+    }
+
+    await this.transactionsService.create(trans);
 
     return createSectionDto.name + ' added in organization ' + createSectionDto.organization_name;
   }
@@ -123,8 +138,19 @@ export class SectionService {
 
     const answer = await this.sectionRepository.update(section, sectionTmp);
     if (!answer) {
-      throw new HttpException('Failed to create the section', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Failed to update the section', HttpStatus.BAD_REQUEST);
     }
+
+    // --- Fill the transaction table --- //
+    const trans: TransactionsClass = {
+      method: 'updateSection',
+      org_id: org.id,
+      section_id: section.id,
+      user_id: null,
+      door_id: null
+    }
+
+    await this.transactionsService.create(trans);
 
     return updateSectionDto.name + ' updated in organization ' + updateSectionDto.organization_name;
   }
@@ -153,6 +179,18 @@ export class SectionService {
       });
     if (door)
       throw new HttpException('Section not empty', HttpStatus.BAD_REQUEST);
+
+
+    // --- Fill the transaction table --- //
+    const trans: TransactionsClass = {
+      method: 'deleteSection',
+      org_id: org.id,
+      section_id: section.id,
+      user_id: null,
+      door_id: null
+    }
+
+    await this.transactionsService.create(trans);
 
     return await this.sectionRepository.remove(section);
   }

@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS "user" (
     username    VARCHAR NOT NULL,
     password    VARCHAR NOT NULL,
     type        VARCHAR NOT NULL,
+    mac_addr    VARCHAR NOT NULL,
     org_id      SERIAL  REFERENCES  organization(id) NOT NULL
 );
 
@@ -38,10 +39,11 @@ CREATE TABLE IF NOT EXISTS auth (
 CREATE TABLE IF NOT EXISTS transactions (
     id          SERIAL  PRIMARY KEY,
     date        timestamp without time zone DEFAULT now(),
-    door_id     SERIAL REFERENCES door(id) NOT NULL,
-    org_id      SERIAL REFERENCES organization(id) NOT NULL,
-    section_id  SERIAL REFERENCES section(id) NOT NULL,
-    user_id     SERIAL REFERENCES "user"(id) NOT NULL
+    method      VARCHAR NOT NULL,
+    door_id     INTEGER REFERENCES door(id),
+    org_id      INTEGER REFERENCES organization(id),
+    section_id  INTEGER REFERENCES section(id),
+    user_id     INTEGER REFERENCES "user"(id)
 );
 
 ----------

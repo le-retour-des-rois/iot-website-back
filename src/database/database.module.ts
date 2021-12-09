@@ -6,6 +6,7 @@ import { Section } from 'src/section/entities/section.entity';
 import { Organization } from 'src/organization/entities/organization.entity';
 import { Door } from 'src/door/entities/door.entity';
 import { Auth } from 'src/admin/entities/auth.entity';
+import { Transactions } from 'src/transactions/entities/transaction.entity';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { Auth } from 'src/admin/entities/auth.entity';
         username: configService.get('POSTGRES_USER'),
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_DB'),
-        entities: [User, Section, Organization, Door, Auth],
+        entities: [User, Section, Organization, Door, Transactions, Auth],
         synchronize: false,
       }),
     }),

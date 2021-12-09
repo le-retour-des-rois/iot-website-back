@@ -18,6 +18,9 @@ export class User {
     @Column("varchar", {nullable: false})
     type: string;
 
+    @Column("varchar", {nullable: false})
+    mac_addr: string;
+
     @Column("integer", {nullable: false})
     org_id: number;
 }
@@ -26,5 +29,6 @@ export class UserTmp {
     username: string;
     password: string;
     type: string;
+    mac_addr: string;
     org_id: number;
 }

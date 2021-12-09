@@ -7,6 +7,7 @@ import { SectionModule } from './section/section.module';
 import { OrganizationModule } from './organization/organization.module';
 import { DoorModule } from './door/door.module';
 import { AdminModule } from './admin/admin.module';
+import { TransactionsModule } from './transactions/transactions.module';
 
 @Module({
   imports: [
@@ -28,7 +29,8 @@ import { AdminModule } from './admin/admin.module';
     SectionModule,
     OrganizationModule,
     DoorModule,
-    AdminModule
+    AdminModule,
+    TransactionsModule
   ],
   controllers: [],
   providers: [],
