@@ -125,4 +125,14 @@ export class AdminService {
 
     return { "authorized" : true }
   }
+
+  async getAuthorizedUsers(hash: string) {
+    // Verfy door's hash
+    const door = await this.doorRepository.findOne({ hash: hash })
+    if (!door) {
+      throw new HttpException('Door not found - Wrong Hash', HttpStatus.NOT_FOUND);
+    }
+
+    return await this.authRepository.find({door_id: door.id});
+  }
 }
