@@ -29,6 +29,10 @@ export class TransactionsService {
     return await this.transactionsRepository.find();
   }
 
+  async findAllByUserId(user_id: number): Promise<Transactions[]> {
+    return await this.transactionsRepository.find({user_id: user_id});
+  }
+
   async findOne(id: number): Promise<Transactions> {
     return await this.transactionsRepository.findOne(id);
   }

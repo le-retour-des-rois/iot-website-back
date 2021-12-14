@@ -10,6 +10,11 @@ export class TransactionsController {
     return this.transactionsService.findAll();
   }
 
+  @Get('user/:user_id')
+  findAllByUserId(@Param('user_id') user_id: string) {
+    return this.transactionsService.findAllByUserId(+user_id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.transactionsService.findOne(+id);
