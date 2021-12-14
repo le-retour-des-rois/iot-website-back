@@ -56,10 +56,15 @@ export class UserService {
       org_id: org.id
     }
 
-    const user = this.userRepository.create(userTmp);
-    if (!user) {
+    const answer = await this.userRepository.save(userTmp);
+    if (!answer) {
       throw new HttpException('Failed to create the user', HttpStatus.BAD_REQUEST);
     }
+
+    const user = await this.userRepository.findOne({
+      mac_addr: createUserDto.mac_addr,
+      org_id: org.id
+    });
 
     // --- Fill the transaction table --- //
     const trans: TransactionsClass = {
