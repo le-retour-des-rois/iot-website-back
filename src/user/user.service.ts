@@ -95,6 +95,24 @@ export class UserService {
     return await this.userRepository.find({org_id: org.id});
   }
 
+  async getIdWithName(organization_name: string, username: string) {
+    // --- Verify if org exists --- //
+    const org = await this.organizationRepository.findOne({name: organization_name});
+    if (!org) {
+      throw new HttpException('Organization does not exist', HttpStatus.NOT_FOUND);
+    }
+    // --- Verify if user exists --- //
+    const user = await this.userRepository.findOne({
+      username: username,
+      org_id: org.id
+    });
+    if (!user) {
+      throw new HttpException('User does not exist', HttpStatus.NOT_FOUND);
+    }
+
+    return { id: user.id }
+  } 
+
   async findOne(id: number): Promise<User> {
     const user = await this.userRepository.findOne(id);
     if (user) {
