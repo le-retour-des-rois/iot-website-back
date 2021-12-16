@@ -135,4 +135,14 @@ export class AdminService {
 
     return await this.authRepository.find({door_id: door.id});
   }
+
+  async getAuthorizedDoors(id: number) {
+    // Verfy door's hash
+    const user = await this.userRepository.findOne({ id })
+    if (!user) {
+      throw new HttpException('User not found - Wrong ID', HttpStatus.NOT_FOUND);
+    }
+
+    return await this.authRepository.find({user_id: id});
+  }
 }

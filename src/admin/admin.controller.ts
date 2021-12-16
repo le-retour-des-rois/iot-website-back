@@ -22,5 +22,8 @@ export class AdminController {
     return this.adminService.getAuthorizedUsers(hash);
   }
 
-  // TODO DELETE USER ACCESS TO DOORS AND SECTIONS
+  @Get('user/:user_id')
+  GetAuthorizedDoors(@Param('user_id') user_id: string) {
+    return this.adminService.getAuthorizedDoors(+user_id);
+  }
 }
