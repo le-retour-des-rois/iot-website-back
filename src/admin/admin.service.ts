@@ -146,6 +146,14 @@ export class AdminService {
       throw new HttpException('User not found - Wrong ID', HttpStatus.NOT_FOUND);
     }
 
-    return await this.authRepository.find({user_id: id});
+    const auths = await this.authRepository.find({user_id: id});
+    let res = [];
+
+    for (let i = 0; i < auths.length; i++) {
+      const door = await this.doorRepository.findOne({id: auths[i].door_id})
+      res = res.concat(door.name);
+    }
+
+    return res;
   }
 }
