@@ -65,14 +65,17 @@ export class AdminService {
       await this.transactionsService.create(trans);
     }
     // --- Take Specific Doors into Account --- //
-    for (let i = 0; i < integrateUserDTO.door_ids.length; i++) {
-      const door_id = integrateUserDTO.door_ids[i];
+    for (let i = 0; i < integrateUserDTO.door_names.length; i++) {
+      const door_name = integrateUserDTO.door_names[i];
+      const door = await this.doorRepository.findOne({name: door_name})
+
+
 
       // Auth doesn't exist yet
-      if (! await this.authRepository.findOne({user_id: user_id, door_id})) {
+      if (! await this.authRepository.findOne({user_id: user_id, door_id: door.id})) {
         const authTmp: AuthTmp = {
           user_id: user_id,
-          door_id: door_id
+          door_id: door.id
         }
           
           
@@ -88,7 +91,7 @@ export class AdminService {
         org_id: null,
         section_id: null,
         user_id: user_id,
-        door_id: door_id
+        door_id: door.id
       }
 
       await this.transactionsService.create(trans);

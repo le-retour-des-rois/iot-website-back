@@ -12,5 +12,5 @@ export class IntegrateUserDTO {
 
     @IsArray()
     @ValidateNested({ each: true })
-    door_ids: [number];
+    door_names: [string];
 }

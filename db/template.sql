@@ -40,10 +40,10 @@ CREATE TABLE IF NOT EXISTS transactions (
     id          SERIAL  PRIMARY KEY,
     date        timestamp without time zone DEFAULT now(),
     method      VARCHAR NOT NULL,
-    door_id     INTEGER NOT NULL,
-    org_id      INTEGER NOT NULL,
-    section_id  INTEGER NOT NULL,
-    user_id     INTEGER NOT NULL,
+    door_id     INTEGER,
+    org_id      INTEGER,
+    section_id  INTEGER,
+    user_id     INTEGER
 );
 
 ----------
